@@ -19,15 +19,27 @@ Le network-server est formé de plusieurs composants que nous allons décrire ci
 
 ### Gateway
 
-Antenne LoRa qui est connectée au module de routage. Elle redirige les transmissions radio LoRa au network-server.
+Antenne LoRa qui est connectée au module de routage. Elle envoie les transmissions radio LoRa qu'elle reçoit des capteurs au network-server.
+
+### Module de routage
+
+Ce module est chargé de gérer le statut de la gateway et d'organiser les transmissions. Il est connecté à un ou plusieurs brokers.
+
+### Broker
+
+Le broker est la partie centrale du réseau. Il est responsable du mapping entre les devices LoRa et la ou les applications tournant sur le serveur d'applications. Son rôle est de rediriger un message en provenance d'un certain capteur à la bonne application et dans le cas du chemin inverse de distribuer le message au bon routeur qui va communiquer avec une gateway qui va elle à son tour relayer le message par transmissions radio LoRa au capteur destinataire.
+
+A noter qu'il peut y avoir plusieurs brokers au sein du network-server.
 
 ### Network-server
 
 Le network-server est responsable des fonctionnalités spécifiques à LoRaWAN.
 
-### Broker
+### Handler
 
-Le broker est la partie centrale du réseau. Il doit gérer le statut de la gateway
+Le handler doit gérer les données relatives à une ou plusieurs applications. Pour ce faire, il se connecte à un broker où sont enregistrés les différents capteurs et applications ainsi que le mapping entre eux.
+
+C'est également dans le handler que les données sont cryptées ou décryptées.
 
 
 ## Spécificités
