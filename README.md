@@ -8,6 +8,14 @@ Pour cela, il a été décidé de mettre en place notre propre infrastructure Lo
 
 L'objectif est donc de mettre en place une infrastructure réseau en installant un network-server LoRaWAN et ses différents composants afin que les capteurs LoRa et l'application web puissent communiquer entre eux.
 
+### Architecture LoRaWAN simplifiée
+
+![Architecture LoRaWAN simplifiée](images/architecture_LoRaWAN_simplifiee.jpg)
+
+### Architecture LoRaWAN détaillée
+
+![Architecture LoRaWAN détaillée](images/architecture_detaillee.png)
+
 
 ## Technologies utilisées
 
@@ -17,9 +25,19 @@ Le network-server est formé de plusieurs composants que nous allons décrire ci
 
 ![Network-server architecture](images/network-server_architecture.png)
 
-### Gateway
 
-Antenne LoRa qui est connectée au module de routage. Elle envoie les transmissions radio LoRa qu'elle reçoit des capteurs au network-server.
+### Devices LoRa
+
+Les devices LoRa sont dans notre cas les capteurs qui envoient des données au réseau LoRaWAN en passant par les LoRa gateways.
+
+### LoRa Gateway
+
+Antenne LoRa qui est connectée au module de routage. Elle envoie les transmissions radio LoRa qu'elle reçoit des capteurs au network-server. Elle implémente un packet-forwarder permettant d'interfacer le hardware LoRa.
+
+### LoRa Gateway Bridge
+
+Le LoRa Gateway Bridge est responsable de la communication avec la gateway. Il transforme les paquets tranportés sur le protocole UDP en payloads JSON sur le protocole MQTT.
+
 
 ### Router
 
@@ -33,7 +51,7 @@ A noter qu'il peut y avoir plusieurs brokers au sein du network-server.
 
 ### Network-server
 
-Le network-server est responsable des fonctionnalités spécifiques à LoRaWAN et a pour tâche de contrôler chaque device enregistré dans la base de données.
+Le network-server est responsable des fonctionnalités spécifiques à LoRaWAN. Il a pour tâche de contrôler chaque device et chaque application enregistrée. Pour ce faire, il demande au serveur d'applications si le node (device) est autorisé dans le réseau et, si oui, quels paramètres il faut appliquer à ce node.
 
 ### Handler
 
@@ -60,6 +78,30 @@ Afin de pouvoir sélectionner la meilleure option de gateway par laquelle envoye
 LoRaWAN est un protocole radio à longue portée, ce qui signifie qu'il est plus que probable que plusieurs gateways reçoivent et retransmettent un message envoyé par un device LoRa, ce qui génère une déduplication du message envoyé. Le broker est chargé de gérer les messages reçus afin de filtrer les messages dupliqués et de n'envoyer qu'une seule fois le message à l'application.
 
 Les messages dupliqués peuvent quand même s'avérer utiles. Les métadonnées de ces messages peuvent être analysées pour trouver la position exacte du device LoRa qui a envoyé la requête et aussi pour mettre à jour les données permettant au module de routage d'améliorer le calcul du score des downlink configurations de manière à rediriger les réponses (messages downlink) aux gateways de façon optimale.
+
+### LoRa App Server
+
+Le LoRa App Server est comme son nom l'indique un serveur d'applications. Il est open-source et est responsable de faire l'inventaire des devices communicant avec l'infrastructure LoRaWAN. Il gère les demandes d'accès des devices aux applications et la réception des payloads de l'application.
+
+LoRa App Server dispose d'une interface web permettant à l'administrateur de gérer les utilisateurs, les devices et les applications autorisés à passer par l'infrastucture du réseau LoRaWAN. Grâce aux APIs RESTful et gRPC, il est possible de faire de l'intégration de services externes.
+
+Lors des transmissions entre les applications et les devices LoRa, les données sont envoyées et reçues en utilisant les protocoles MQTT et/ou HTTP(S).
+
+
+#### REST API pour le LoRa App Server
+
+![REST API pour le LoRa App Server](images/LoRaAppServer_REST_API.png)
+
+#### Exemple d'applications ajoutées
+
+![Exemple d'applications ajoutées](images/exemple_applications.png)
+
+
+
+
+
+
+
 
 
 ## Spécificités
