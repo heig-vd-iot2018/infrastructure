@@ -37,10 +37,10 @@ Dans ce chapitre, nous allons voir comment a été déployée l'infrastructure e
 Pour accéder à la VM sur le serveur de l'école, il faut tout d'abord se connecter au réseau de l'école puis ouvrir un terminal et taper une des deux commandes suivantes:
 
 
-##### ssh -l heiguser 10.192.72.26  
+###### ssh -l heiguser 10.192.72.26  
 
 
-##### ssh -l heiguser iot_lora.lan.iict.ch
+###### ssh -l heiguser iot_lora.lan.iict.ch
 
 Remarque : il est possible qu'à ce stade, un message d'erreur apparaisse en indiquant qu'il n'est pas possible d'ajouter l'hôte à la liste des hôtes connus. Ignorez et tapez "yes" pour continuer.
 
@@ -79,17 +79,66 @@ Avec le câble série, il faut être attentif au branchement suivant sur la gate
 
 Branchez ensuite la partie USB sur votre machine et à l'aide d'un émulateur de terminal (PuTTY par exemple), spécifiez une connexion série avec un port 115200 et l'hôte COM qui correspond à celui configuré pour le périphérique USB de votre machine (peut être configuré sur le gestionnaire de périphériques).
 
+Remarque: vous ne pourrez pas vous connecter en série si vous n'avez pas activé le SPI sur le Raspberry (voir installation gateway pour plus de détails).
+
 #### Depuis le LoRa Server
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ### Installation de la gateway
 Ce chapitre explique comment mettre en place une gateway à partir d'un Raspberry Pi modèle 2B.
 
-#### installation de l'OS Raspbian
+#### Installation de l'OS Raspbian
 La première étape consiste à installer un système d'exploitation sur la carte SD du Raspberry. 
 L'OS choisit est décrit plus haut dans les spécificités.
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#### Mosquito
+
+Il faut ensuite insérer la carte SD dans le Raspberry et brancher l'alimentation pour le démarrer.
+
+La procédure est vraiment très simple. Vous trouverez plus de détails à l'adressse <https://www.raspberrypi.org/learning/software-guide/>, notamment comment préparer la carte SD.
+#### Installation LoRa-Gateway sur la gateway
+Il faut désormais équiper le Raspberry du LoRa-gateway. Pour commencer, connectez la carte Lora (iC880A-SPI) au Raspberry.
+
+Accédez au terminal du Raspberry, puis tapez la commande : 
+
+###### $ sudo raspi-config
+
+Une interface de configuration va s'ouvrir. Il faudra activer le SPI en allant sur "Interfacing options". Ensuite, dans "Advanced options" choisissez "Expand filesystem".
+
+Ces modifications seront prisent en compte lors du redémarrage.
+
+Par la suite, il va falloir configurer la "time zone":
+
+###### $ sudo dpkg-reconfigure locales
+
+###### $ sudo dpkg-reconfigure tzdata
+
+Installer git si ce n'est pas déjà fait:
+
+###### $ sudo apt-get update
+
+###### $ sudo apt-get upgrade
+
+###### $ sudo apt-get install git
+
+Installer Mosquitto:
+
+###### $ sudo apt-get install mosquitto
+
+Cloner et installer le Lora-gateway:
+
+###### $ git clone -b spi https://github.com/ttn-zh/ic880a-gateway.git ~/ic880a-gateway
+
+###### $ cd ~/ic880a-gateway
+
+###### $ sudo ./install.sh spi
+
+La gateway devrait être opérationnelle à présent.
+#### Ajouter la gateway au Network Server
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+### Connection entre le LoRa App Server et l'application web (front-end)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+### LoRa Server REST API
+Il est possible de communiquer avec le LoraServer grâce à une API REST détaillée à l'adresse suivante: <https://iot_lora.lan.iict.ch:8080/api>
 
 ## Conclusion
 [Points à améliorer, points en suspens, améliorations futures, ...]
