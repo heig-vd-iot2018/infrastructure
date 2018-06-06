@@ -82,7 +82,7 @@ Branchez ensuite la partie USB sur votre machine et à l'aide d'un émulateur de
 Remarque: vous ne pourrez pas vous connecter en série si vous n'avez pas activé le SPI sur le Raspberry (voir installation gateway pour plus de détails).
 
 #### Depuis le LoRa Server
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+En se connectant à l'interface graphique du LoRa Server (connexion nécessaire au réseau de la HEIG-VD) à l'adresse suivante <https://iot_lora.lan.iict.ch:8080/> (user : admin, pasword: groupe-infra-pass-interface), cliquer sur l'onglet "Gateways", puis sélectionner "IotGateway" qui est la seule gateway ajoutée pour l'instant. Il est possible de consulter la localisation de cette gateway, ainsi que de configurer le LoRa network server auquel elle est liée.
 ### Installation de la gateway
 Ce chapitre explique comment mettre en place une gateway à partir d'un Raspberry Pi modèle 2B.
 
@@ -130,15 +130,49 @@ Cloner et installer le Lora-gateway:
 
 ###### $ sudo ./install.sh spi
 
+#### Configuration du packet forwarder
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 La gateway devrait être opérationnelle à présent.
 #### Ajouter la gateway au Network Server
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Comme expliqué au chapitre "Accès à la gateway", il suffit de se connecter à l'interface graphique du LoRa server et accéder à l'onglet de configuration des gateways pour établir un lien avec un network server. Cependant, il faut créer au préalable un network server. Pour cela, il faut accéder à la page "Network Servers" puis cliquer sur "Add Network Server".
+Il faut spécifier le nom et l'adresse du network server. Actuellement, le network server en place possède le nom "infra-net-serv" et le hostname "loraserver:8000".
 
-### Connection entre le LoRa App Server et l'application web (front-end)
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+### Connection entre le LoRa App Server et l'application web (frontend)
+Pour héberger une application frontend, une image appelée "passenger" est à disposition sur la VM du serveur de l'école : /home/Documents/passenger.
+
+Dans ce dossier, un dockerfile permet de construire une image mettant en place un serveur web Nginx et définissant l'application à déployer et sa configuration.
+
+L'application frontend à déployer se trouve dans /home/Documents/passenger/web-app et sa configuration dans /home/Documents/passenger/conf. 
+
+Dans le dockerfile, les lignes spécifiant le déploiement du frontend sont les suivantes:
+
+###### COPY --chown=app:app web-app/helloWorld.js /home/app/webapp
+###### ADD conf/webapp.conf /etc/nginx/sites-enabled/webapp.conf
+
+Remarque: ici, il's'agit d'un exemple avec une app "HelloWorld". Il faut la remplacer par l'app que l'on souhaite déployer.
+
+
+L'image Docker "passenger" est donc indépendante du reste de l'infrastructure. Par conséquent, il faut build cette image et la run avec la commande suivante (attention à respecter le bon port-mapping):
+
+###### docker run —name passenger -p 3000:3000 infra/phusion-passenger
+
+
+### Connection entre le LoRa App Server et l'application web (backend)
+Le backend possède sa propre infrastructure. Il faut cependant établir, sur le LoRa server, un lien entre le backend et le device (ici: un capteur).
+
+Pour cela, il faut créer un "service-profile", un "device" et une "application".
+Tout cela est possible via l'interface graphique du LoRa server sous les différents onglet correspondants. 
+
+Il est à noter, qu'un "device" est défini par son nom, une description, son identifiant EUI et le "service-profile" utilisé. Actuellement le nom est "test-sensor-5", son EUI "0004a30b001a1e25" et son "service-profile" est "firm-dev-profile". Le "service-profile", défini un état de communication en spécifiant par exemple le newtwork server (infra-net-serv) utilisé ou la fréquence des requêtes de status du "device". L'application est définie par son nom est le "service-profile" utilisé (ici respectivement "backend" et "firm-dev-profile").
+
 
 ### LoRa Server REST API
 Il est possible de communiquer avec le LoraServer grâce à une API REST détaillée à l'adresse suivante: <https://iot_lora.lan.iict.ch:8080/api>
+
+
+## Test de connexion entre la gateway et le LoRa server
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ## Conclusion
 [Points à améliorer, points en suspens, améliorations futures, ...]
