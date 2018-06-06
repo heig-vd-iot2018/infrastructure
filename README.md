@@ -21,7 +21,7 @@ L'objectif est donc de mettre en place une infrastructure réseau en installant 
 
 Pour commencer à mettre en place notre infrastructure réseau, nous avons choisi d'utiliser un network-server LoRaWAN open-source mis à disposition par CableLabs sur le site [loraserver.io](www.loraserver.io).
 
-Le network-server est formé de plusieurs composants que nous allons décrire ci-dessous.
+Le network-server est formé de plusieurs composants et fonctionnalités que nous allons décrire dans ce chapitre.
 
 ![Network-server architecture](images/network-server_architecture.png)
 
