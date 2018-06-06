@@ -214,20 +214,62 @@ Installer git si ce n'est pas déjà fait:
 
 ###### $ sudo apt-get install git
 
-Installer Mosquitto:
 
-###### $ sudo apt-get install mosquitto
+Installation de Lora Gateway:
 
-Cloner et installer le Lora-gateway:
+###### 1- cloner le repo https://github.com/Lora-net/lora_gateway.git 
 
-###### $ git clone -b spi https://github.com/ttn-zh/ic880a-gateway.git ~/ic880a-gateway
+###### 2- cd lora_gateway/
 
-###### $ cd ~/ic880a-gateway
+###### 3- make all
 
-###### $ sudo ./install.sh spi
+###### 4- ./reset_lgw.sh start
 
-#### Configuration du packet forwarder
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Installation du Packet Forwarder
+
+###### 1- cloner le repo https://github.com/Lora-net/packet_forwarder.git
+
+###### 2- cd /packet_forwarder
+
+###### 3- sudo ./compile.sh
+
+###### 4- make all
+
+###### 5- sudo nano /packet_forwarder/local_config.json et faire les modifications suivantes:
+```
+{
+ ...
+"gateway_conf":{
+  "gateway_ID": B827EBFFFE1EE042
+  }
+}
+```
+###### 6- sudo nano /packet_forwarder/global_config.json et faire les modifications suivantes:
+```
+{
+ ...
+"gateway_conf":{
+  "gateway_ID": B827EBFFFE1EE042,
+  "server_address":"10.192.72.26",
+  "srrv_port_up": 1700,
+  "srrv_port_down": 1700,
+  ...
+  }
+}
+```
+
+Lancement de la gateway:
+
+
+###### 1- cd packet_forwarder/lora_pkt_fwd/
+
+###### 2- sudo ./update_guid.sh ./local_config.json => pour update le EUI de la gateway
+
+###### 3- cd packet_forwarder/lora_pkt_fwd/
+
+###### 4- sudo ./lora_pkt_fwd
+
 
 La gateway devrait être opérationnelle à présent.
 #### Ajouter la gateway au Network Server
@@ -267,12 +309,14 @@ Il est à noter, qu'un "device" est défini par son nom, une description, son id
 Il est possible de communiquer avec le LoraServer grâce à une API REST détaillée à l'adresse suivante: <https://iot_lora.lan.iict.ch:8080/api>
 
 
-## Test de connexion entre la gateway et le LoRa server
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 ## Conclusion
-[Points à améliorer, points en suspens, améliorations futures, ...]
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+L'infrastructure est en place et fonctionne. On constate que la connexion fonctionne entre la gateway et le device. Voici le trafic reçu par la gateway:
+![Branchement câble série](./images/2.png)
+
+
+En ce qui concerne la communication entre le device et le LoRa server, voici ce qui est reçu:
+![Branchement câble série](./images/3.jpg)
+
 
 ## Documentation supplémentaire
 
