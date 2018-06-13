@@ -109,19 +109,19 @@ Lors des transmissions entre les applications et les devices LoRa, les données 
 Il faut être connecté au réseau de l'école ou utiliser un VPN pour pouvoir atteindre les différents composants du système.
 
 #### VM sur le serveur de l'école :
-* Ubuntu 18.04 LTS bionic beaver 
+* Ubuntu 18.04 LTS bionic beaver
 * 50GB de mémoire
 * 2GB de RAM
 * CPU DualCore
 * Adresse IP:  10.192.72.26  
 * Nom de domaine: iot_lora.lan.iict.ch
 * docker: installation de docker-ce, package du 04 mai 2018
-#### Gateway : 
+#### Gateway :
 * Raspberry Pi 3 B
 * RASPBIAN STRETCH LITE 4.14 (pas de bureau graphique)
 * SD card 4GB
 * connexion à un écran: HDMI
-* connexion à la console Raspberry via un câble série. L'émulateur de terminal (PuTTY par exemple) 
+* connexion à la console Raspberry via un câble série. L'émulateur de terminal (PuTTY par exemple)
 * connexion internet: Ethernet (réception adresse du pool DHCP de l'école)
 * carte Lora: iC880A-SPI
 
@@ -159,7 +159,7 @@ Il faut ensuite saisir l'utilisateur "admin" et le mot de passe "groupe-infra-pa
 Dans le cas où la topologie docker ne serait pas lancée sur le serveur (impossibilité de se connecter à l'interface graphique du LoRa Server), il faut accéder à la VM via un terminal comme expliqué plus haut, au compte "heiguser" puis au dossier /home/heiguser/home/Documents/repos/loraserver-docker.
 Tapez la commande suivante pour démarrer le LoRa Server:
 
-##### docker-compose up 
+##### docker-compose up
 
 ### Accès à la gateway
 Pour accéder à la gateway, il y a deux possibilités: soit on veut accéder à distance via l'interface graphique du LoRa Server, soit directement via un câble série ou HDMI.
@@ -183,7 +183,7 @@ En se connectant à l'interface graphique du LoRa Server (connexion nécessaire 
 Ce chapitre explique comment mettre en place une gateway à partir d'un Raspberry Pi modèle 2B.
 
 #### Installation de l'OS Raspbian
-La première étape consiste à installer un système d'exploitation sur la carte SD du Raspberry. 
+La première étape consiste à installer un système d'exploitation sur la carte SD du Raspberry.
 L'OS choisit est décrit plus haut dans les spécificités.
 
 Il faut ensuite insérer la carte SD dans le Raspberry et brancher l'alimentation pour le démarrer.
@@ -192,7 +192,7 @@ La procédure est vraiment très simple. Vous trouverez plus de détails à l'ad
 #### Installation LoRa-Gateway sur la gateway
 Il faut désormais équiper le Raspberry du LoRa-gateway. Pour commencer, connectez la carte Lora (iC880A-SPI) au Raspberry.
 
-Accédez au terminal du Raspberry, puis tapez la commande : 
+Accédez au terminal du Raspberry, puis tapez la commande :
 
 ###### $ sudo raspi-config
 
@@ -217,7 +217,7 @@ Installer git si ce n'est pas déjà fait:
 
 Installation de Lora Gateway:
 
-###### 1- cloner le repo https://github.com/Lora-net/lora_gateway.git 
+###### 1- cloner le repo https://github.com/Lora-net/lora_gateway.git
 
 ###### 2- cd lora_gateway/
 
@@ -281,7 +281,7 @@ Pour héberger une application frontend, une image Docker appelée "passenger" e
 
 Dans ce dossier, un dockerfile permet de construire une image mettant en place un serveur web Nginx et définissant l'application à déployer et sa configuration.
 
-L'application frontend à déployer se trouve dans /home/Documents/passenger/web-app et sa configuration dans /home/Documents/passenger/conf. 
+L'application frontend à déployer se trouve dans /home/Documents/passenger/web-app et sa configuration dans /home/Documents/passenger/conf.
 
 Dans le dockerfile, les lignes spécifiant le déploiement du frontend sont les suivantes:
 
@@ -300,7 +300,7 @@ L'image Docker "passenger" est donc indépendante du reste de l'infrastructure. 
 Le backend possède sa propre infrastructure. Il faut cependant établir, sur le LoRa server, un lien entre le backend et le device (ici: un capteur).
 
 Pour cela, il faut créer un "service-profile", un "device" et une "application".
-Tout cela est possible via l'interface graphique du LoRa server sous les différents onglet correspondants. 
+Tout cela est possible via l'interface graphique du LoRa server sous les différents onglet correspondants.
 
 Il est à noter, qu'un "device" est défini par son nom, une description, son identifiant EUI et le "service-profile" utilisé. Actuellement le nom est "test-sensor-5", son EUI "0004a30b001a1e25" et son "service-profile" est "firm-dev-profile". Le "service-profile", défini un état de communication en spécifiant par exemple le newtwork server (infra-net-serv) utilisé ou la fréquence des requêtes de status du "device". L'application est définie par son nom est le "service-profile" utilisé (ici respectivement "backend" et "firm-dev-profile").
 
@@ -316,6 +316,14 @@ L'infrastructure est en place et fonctionne. On constate que la connexion foncti
 
 En ce qui concerne la communication entre le device et le LoRa server, voici ce qui est reçu:
 ![Branchement câble série](./images/3.jpg)
+
+## Bugs connus
+Il y'a deux cas où la communication entre le loraserver et le device ne fonctionne pas:
+- Dans un premier cas le device reçoit un denied de la part du serveur : dans ce cas, nous pouvons voir les deux messages (`UPLINK` et `DOWNLINK`) du join du device et la réponse du serveur (`accepted`) sur l'interface du `lora app server`. Cependant, le device considère que c'est `denied` car la réponse arrive plus tard qu'elle ne devrait arriver.
+
+Nous avons pu voir ceci dans les logs du `packet forwarder`.
+
+- Le duxième cas est celui des canaux authorisés par la gateway et ceux utilisés par le device. En effet, nous avons pu apercevoir dans la console du device qui reçoit le message `no_free_channel`. Nous avons alors inspecté ce problème en consultant les logs du `loraserver` et nous avons pu voir l'erreur `... lorawan/band invalid channel ...`.
 
 
 ## Documentation supplémentaire
