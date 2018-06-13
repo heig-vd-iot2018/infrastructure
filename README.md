@@ -276,8 +276,8 @@ La gateway devrait être opérationnelle à présent.
 Comme expliqué au chapitre "Accès à la gateway", il suffit de se connecter à l'interface graphique du LoRa server et accéder à l'onglet de configuration des gateways pour établir un lien avec un network server. Cependant, il faut créer au préalable un network server. Pour cela, il faut accéder à la page "Network Servers" puis cliquer sur "Add Network Server".
 Il faut spécifier le nom et l'adresse du network server. Actuellement, le network server en place possède le nom "infra-net-serv" et le hostname "loraserver:8000".
 
-### Connection entre le LoRa App Server et l'application web (frontend)
-Pour héberger une application frontend, une image appelée "passenger" est à disposition sur la VM du serveur de l'école : /home/Documents/passenger.
+### Connexion entre le LoRa App Server et l'application web (frontend)
+Pour héberger une application frontend, une image Docker appelée "passenger" est à disposition sur la VM du serveur de l'école : /home/Documents/passenger.
 
 Dans ce dossier, un dockerfile permet de construire une image mettant en place un serveur web Nginx et définissant l'application à déployer et sa configuration.
 
@@ -296,7 +296,7 @@ L'image Docker "passenger" est donc indépendante du reste de l'infrastructure. 
 ###### docker run —name passenger -p 3000:3000 infra/phusion-passenger
 
 
-### Connection entre le LoRa App Server et l'application web (backend)
+### Connexion entre le LoRa App Server et l'application web (backend)
 Le backend possède sa propre infrastructure. Il faut cependant établir, sur le LoRa server, un lien entre le backend et le device (ici: un capteur).
 
 Pour cela, il faut créer un "service-profile", un "device" et une "application".
