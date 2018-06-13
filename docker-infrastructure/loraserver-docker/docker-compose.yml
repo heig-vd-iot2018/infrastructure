@@ -1,0 +1,45 @@
+version: "2"
+
+services:
+  loraserver:
+    image: loraserver/loraserver:latest
+    volumes:
+      - "$LORA_HOME_DIR/configuration/loraserver:/etc/loraserver"
+
+  appserver:
+    image: loraserver/lora-app-server:latest
+    ports:
+      - 8080:8080
+    volumes:
+      - "$LORA_HOME_DIR/configuration/lora-app-server:/etc/lora-app-server"
+
+  gatewaybridge:
+    image: loraserver/lora-gateway-bridge:latest
+    ports:
+      - 1700:1700/udp
+    volumes:
+      - "$LORA_HOME_DIR/configuration/lora-gateway-bridge:/etc/lora-gateway-bridge"
+
+  postgresql:
+    image: postgres:9.6-alpine
+    ports:
+      - 5432
+    volumes:
+      - "postgresql:/var/lib/postgresql/data"
+      - "$LORA_HOME_DIR/configuration/postgresql/initdb:/docker-entrypoint-initdb.d"
+
+  redis:
+    ports:
+      - 6379
+    image: redis:4-alpine
+    volumes:
+      - "$LORA_HOME_DIR/data/redis:/data"
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - 1883:1883
+
+volumes:
+  postgresql:
+    driver: local
